@@ -65,25 +65,21 @@ impl Registry {
 
     pub fn register<C: Component + Send + Sync>(&mut self) {
         let id = StorageId::of::<C>();
-        println!("Register Component - {:?}", id);
         self.comps.insert(id, move_component::<C>);
     }
 
     // pub fn register_non_send<C: Component + Sync>(&mut self) {
     //     let id = StorageId::of::<C>();
-    //     println!("Register Component - {:?}", id);
     //     self.comps.insert(id, move_component_non_send::<C>);
     // }
 
     // pub fn register_non_sync<C: Component + Send>(&mut self) {
     //     let id = StorageId::of::<C>();
-    //     println!("Register Component - {:?}", id);
     //     self.comps.insert(id, move_component_non_sync::<C>);
     // }
 
     // pub fn register_non_send_sync<C: Component + Sync>(&mut self) {
     //     let id = StorageId::of::<C>();
-    //     println!("Register Component - {:?}", id);
     //     self.comps.insert(id, move_component_non_send_sync::<C>);
     // }
 
