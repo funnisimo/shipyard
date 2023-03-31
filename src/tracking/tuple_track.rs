@@ -1,7 +1,5 @@
-use crate::all_storages::AllStorages;
+use crate::all_storages::{AllStorages, ComponentStorageAccess};
 use crate::component::Component;
-use crate::sparse_set::SparseSet;
-use crate::storage::StorageId;
 #[cfg(doc)]
 use crate::world::World;
 
@@ -23,35 +21,45 @@ impl<T: Send + Sync + Component> TupleTrack for T {
     #[inline]
     fn track_insertion(all_storages: &mut AllStorages) {
         all_storages
-            .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<T>>(), SparseSet::<T>::new)
+            // .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<T>>(), SparseSet::<T>::new)
+            .component_storage_or_insert_mut::<T>()
+            .unwrap()
             .track_insertion();
     }
 
     #[inline]
     fn track_modification(all_storages: &mut AllStorages) {
         all_storages
-            .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<T>>(), SparseSet::<T>::new)
+            // .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<T>>(), SparseSet::<T>::new)
+            .component_storage_or_insert_mut::<T>()
+            .unwrap()
             .track_modification();
     }
 
     #[inline]
     fn track_deletion(all_storages: &mut AllStorages) {
         all_storages
-            .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<T>>(), SparseSet::<T>::new)
+            // .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<T>>(), SparseSet::<T>::new)
+            .component_storage_or_insert_mut::<T>()
+            .unwrap()
             .track_deletion();
     }
 
     #[inline]
     fn track_removal(all_storages: &mut AllStorages) {
         all_storages
-            .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<T>>(), SparseSet::<T>::new)
+            // .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<T>>(), SparseSet::<T>::new)
+            .component_storage_or_insert_mut::<T>()
+            .unwrap()
             .track_removal();
     }
 
     #[inline]
     fn track_all(all_storages: &mut AllStorages) {
         all_storages
-            .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<T>>(), SparseSet::<T>::new)
+            // .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<T>>(), SparseSet::<T>::new)
+            .component_storage_or_insert_mut::<T>()
+            .unwrap()
             .track_all();
     }
 }
@@ -63,7 +71,8 @@ macro_rules! impl_track {
             fn track_insertion(all_storages: &mut AllStorages) {
                 $(
                     all_storages
-                        .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<$type>>(), SparseSet::<$type>::new)
+                        // .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<$type>>(), SparseSet::<$type>::new)
+                        .component_storage_or_insert_mut::<$type>().unwrap()
                         .track_insertion();
                 )+
             }
@@ -71,7 +80,8 @@ macro_rules! impl_track {
             fn track_modification(all_storages: &mut AllStorages) {
                 $(
                     all_storages
-                        .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<$type>>(), SparseSet::<$type>::new)
+                        // .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<$type>>(), SparseSet::<$type>::new)
+                        .component_storage_or_insert_mut::<$type>().unwrap()
                         .track_modification();
                 )+
             }
@@ -79,7 +89,8 @@ macro_rules! impl_track {
             fn track_deletion(all_storages: &mut AllStorages) {
                 $(
                     all_storages
-                        .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<$type>>(), SparseSet::<$type>::new)
+                        // .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<$type>>(), SparseSet::<$type>::new)
+                        .component_storage_or_insert_mut::<$type>().unwrap()
                         .track_deletion();
                 )+
             }
@@ -87,7 +98,8 @@ macro_rules! impl_track {
             fn track_removal(all_storages: &mut AllStorages) {
                 $(
                     all_storages
-                        .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<$type>>(), SparseSet::<$type>::new)
+                        // .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<$type>>(), SparseSet::<$type>::new)
+                        .component_storage_or_insert_mut::<$type>().unwrap()
                         .track_removal();
                 )+
             }
@@ -95,7 +107,8 @@ macro_rules! impl_track {
             fn track_all(all_storages: &mut AllStorages) {
                 $(
                     all_storages
-                        .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<$type>>(), SparseSet::<$type>::new)
+                        // .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<$type>>(), SparseSet::<$type>::new)
+                        .component_storage_or_insert_mut::<$type>().unwrap()
                         .track_all();
                 )+
             }

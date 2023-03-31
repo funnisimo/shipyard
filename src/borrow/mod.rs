@@ -16,11 +16,11 @@ pub use non_send_sync::NonSendSync;
 pub use non_sync::NonSync;
 pub use world_borrow::WorldBorrow;
 
-use crate::all_storages::{AllStorages, CustomStorageAccess};
+use crate::all_storages::{AllStorages, ComponentStorageAccess, CustomStorageAccess};
 use crate::atomic_refcell::{ARef, ARefMut, SharedBorrow};
 use crate::component::{Component, Unique};
 use crate::error;
-use crate::sparse_set::SparseSet;
+// use crate::sparse_set::SparseSet;
 use crate::tracking::{Track, Tracking};
 use crate::unique::UniqueStorage;
 use crate::views::{EntitiesView, EntitiesViewMut, UniqueView, UniqueViewMut, View, ViewMut};
@@ -160,7 +160,7 @@ where
         last_run: Option<u32>,
         current: u32,
     ) -> Result<Self::View<'a>, error::GetStorage> {
-        let view = all_storages.custom_storage_or_insert(SparseSet::new)?;
+        let view = all_storages.component_storage_or_insert::<T>()?;
 
         let (sparse_set, borrow) = unsafe { ARef::destructure(view) };
 
@@ -292,7 +292,7 @@ where
         last_run: Option<u32>,
         current: u32,
     ) -> Result<Self::View<'a>, error::GetStorage> {
-        let view = all_storages.custom_storage_or_insert_mut(SparseSet::new)?;
+        let view = all_storages.component_storage_or_insert_mut::<T>()?;
 
         let (sparse_set, borrow) = unsafe { ARefMut::destructure(view) };
 

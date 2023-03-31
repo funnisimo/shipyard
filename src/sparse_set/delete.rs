@@ -1,8 +1,8 @@
-use crate::all_storages::AllStorages;
+use crate::all_storages::{AllStorages, ComponentStorageAccess};
 use crate::component::Component;
 use crate::entity_id::EntityId;
-use crate::sparse_set::SparseSet;
-use crate::storage::StorageId;
+// use crate::sparse_set::SparseSet;
+// use crate::storage::StorageId;
 #[cfg(doc)]
 use crate::world::World;
 
@@ -18,7 +18,9 @@ impl<T: Send + Sync + Component> TupleDelete for T {
         let current = all_storages.get_current();
 
         all_storages
-            .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<T>>(), SparseSet::<T>::new)
+            // .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<T>>(), SparseSet::<T>::new)
+            .component_storage_or_insert_mut::<T>()
+            .unwrap()
             .dyn_delete(entity, current)
     }
 }
@@ -31,7 +33,8 @@ macro_rules! impl_delete_component {
 
                 $(
                     all_storages
-                        .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<$type>>(), SparseSet::<$type>::new)
+                        // .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<$type>>(), SparseSet::<$type>::new)
+                        .component_storage_or_insert_mut::<$type>().unwrap()
                         .dyn_delete(entity, current)
                 )||+
             }

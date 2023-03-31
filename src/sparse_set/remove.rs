@@ -1,8 +1,8 @@
-use crate::all_storages::AllStorages;
+use crate::all_storages::{AllStorages, ComponentStorageAccess};
 use crate::component::Component;
 use crate::entity_id::EntityId;
-use crate::sparse_set::SparseSet;
-use crate::storage::StorageId;
+// use crate::sparse_set::SparseSet;
+// use crate::storage::StorageId;
 #[cfg(doc)]
 use crate::world::World;
 
@@ -22,7 +22,9 @@ impl<T: Send + Sync + Component> TupleRemove for T {
         let current = all_storages.get_current();
 
         all_storages
-            .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<T>>(), SparseSet::new)
+            // .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<T>>(), SparseSet::new)
+            .component_storage_or_insert_mut::<T>()
+            .unwrap()
             .dyn_remove(entity, current)
     }
 }
@@ -37,7 +39,8 @@ macro_rules! impl_remove_component {
 
                 ($(
                     all_storages
-                        .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<$type>>(), SparseSet::new)
+                        // .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<$type>>(), SparseSet::new)
+                        .component_storage_or_insert_mut::<$type>().unwrap()
                         .dyn_remove(entity, current),
                 )+)
             }

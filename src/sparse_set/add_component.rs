@@ -1,8 +1,8 @@
-use crate::all_storages::AllStorages;
+use crate::all_storages::{AllStorages, ComponentStorageAccess};
 use crate::component::Component;
 use crate::entity_id::EntityId;
-use crate::sparse_set::SparseSet;
-use crate::storage::StorageId;
+// use crate::sparse_set::SparseSet;
+// use crate::storage::StorageId;
 #[cfg(doc)]
 use crate::world::World;
 
@@ -23,7 +23,9 @@ impl<T: Send + Sync + Component> TupleAddComponent for T {
     fn add_component(self, all_storages: &mut AllStorages, entity: EntityId) {
         let current = all_storages.get_current();
         all_storages
-            .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<T>>(), SparseSet::new)
+            // .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<T>>(), SparseSet::new)
+            .component_storage_or_insert_mut::<T>()
+            .unwrap()
             .insert(entity, self, current);
     }
 }
@@ -36,7 +38,8 @@ macro_rules! impl_add_component {
                 let current = all_storages.get_current();
                 $(
                     all_storages
-                        .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<$type>>(), SparseSet::new)
+                        // .exclusive_storage_or_insert_mut(StorageId::of::<SparseSet<$type>>(), SparseSet::new)
+                        .component_storage_or_insert_mut::<$type>().unwrap()
                         .insert(entity, self.$index, current);
                 )+
             }

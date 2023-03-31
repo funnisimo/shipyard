@@ -1,7 +1,9 @@
+mod component_storage;
 mod custom_storage;
 mod delete_any;
 mod retain;
 
+pub use component_storage::ComponentStorageAccess;
 pub use custom_storage::CustomStorageAccess;
 pub use delete_any::{CustomDeleteAny, TupleDeleteAny};
 pub use retain::TupleRetain;
@@ -14,11 +16,12 @@ use crate::entity_id::EntityId;
 use crate::get_component::GetComponent;
 use crate::iter_component::{IntoIterRef, IterComponent};
 use crate::memory_usage::AllStoragesMemoryUsage;
+use crate::move_world::Registry;
 use crate::public_transport::RwLock;
 use crate::public_transport::ShipyardRwLock;
 use crate::reserve::BulkEntityIter;
 use crate::sparse_set::{BulkAddEntity, TupleAddComponent, TupleDelete, TupleRemove};
-use crate::storage::{SBox, Storage, StorageId};
+use crate::storage::{SBox, StorageId};
 use crate::system::AllSystem;
 use crate::tracking::{TrackingTimestamp, TupleTrack};
 use crate::{error, UniqueStorage};
@@ -41,6 +44,7 @@ pub struct AllStorages {
     #[cfg(feature = "thread_local")]
     thread_id: std::thread::ThreadId,
     counter: Arc<AtomicU32>,
+    pub(crate) comp_registry: RwLock<Option<Registry>>,
 }
 
 #[cfg(not(feature = "thread_local"))]
@@ -60,6 +64,7 @@ impl AllStorages {
             #[cfg(feature = "thread_local")]
             thread_id: std::thread::current().id(),
             counter,
+            comp_registry: RwLock::new_std(Some(Registry::new())),
         }
     }
     pub(crate) fn new_with_lock<L: ShipyardRwLock + Send + Sync>(counter: Arc<AtomicU32>) -> Self {
@@ -72,6 +77,7 @@ impl AllStorages {
             #[cfg(feature = "thread_local")]
             thread_id: std::thread::current().id(),
             counter,
+            comp_registry: RwLock::new_custom::<L>(Some(Registry::new())),
         }
     }
     /// Adds a new unique storage, unique storages store exactly one `T` at any time.  
@@ -912,28 +918,30 @@ let i = all_storages.run(sys1);
             })
         }
     }
-    pub(crate) fn exclusive_storage_or_insert_mut<T, F>(
-        &mut self,
-        storage_id: StorageId,
-        f: F,
-    ) -> &mut T
-    where
-        T: 'static + Storage + Send + Sync,
-        F: FnOnce() -> T,
-    {
-        let storages = self.storages.get_mut();
 
-        unsafe {
-            &mut *storages
-                .entry(storage_id)
-                .or_insert_with(|| SBox::new(f()))
-                .0
-        }
-        .get_mut()
-        .as_any_mut()
-        .downcast_mut()
-        .unwrap()
-    }
+    // pub(crate) fn exclusive_storage_or_insert_mut<T, F>(
+    //     &mut self,
+    //     storage_id: StorageId,
+    //     f: F,
+    // ) -> &mut T
+    // where
+    //     T: 'static + Storage + Send + Sync,
+    //     F: FnOnce() -> T,
+    // {
+    //     let storages = self.storages.get_mut();
+
+    //     unsafe {
+    //         &mut *storages
+    //             .entry(storage_id)
+    //             .or_insert_with(|| SBox::new(f()))
+    //             .0
+    //     }
+    //     .get_mut()
+    //     .as_any_mut()
+    //     .downcast_mut()
+    //     .unwrap()
+    // }
+
     /// Make the given entity alive.  
     /// Does nothing if an entity with a greater generation is already at this index.  
     /// Returns `true` if the entity is successfully spawned.

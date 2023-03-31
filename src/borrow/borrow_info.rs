@@ -5,7 +5,7 @@ use super::non_send_sync::NonSendSync;
 #[cfg(feature = "thread_local")]
 use super::non_sync::NonSync;
 use super::Mutability;
-use crate::all_storages::{AllStorages, CustomStorageAccess};
+use crate::all_storages::{AllStorages, ComponentStorageAccess};
 use crate::component::{Component, Unique};
 use crate::entities::Entities;
 use crate::error;
@@ -142,7 +142,7 @@ where
     ) {
         enable_tracking_fn.push(|all_storages| {
             all_storages
-                .custom_storage_or_insert_mut(SparseSet::<T>::new)?
+                .component_storage_or_insert_mut::<T>()?
                 .enable_tracking::<Track<TRACK>>();
 
             Ok(())
@@ -248,7 +248,7 @@ where
     ) {
         enable_tracking_fn.push(|all_storages| {
             all_storages
-                .custom_storage_or_insert_mut(SparseSet::<T>::new)?
+                .component_storage_or_insert_mut::<T>()?
                 .enable_tracking::<Track<TRACK>>();
 
             Ok(())

@@ -1,4 +1,4 @@
-use crate::all_storages::{AllStorages, CustomStorageAccess};
+use crate::all_storages::{AllStorages, ComponentStorageAccess};
 use crate::atomic_refcell::{ARef, ARefMut};
 use crate::atomic_refcell::{ExclusiveBorrow, SharedBorrow};
 #[cfg(feature = "thread_local")]
@@ -136,7 +136,7 @@ impl<T: Component + Send + Sync> GetComponent for &'_ T {
         _current: u32,
         entity: EntityId,
     ) -> Result<Self::Out<'a>, error::GetComponent> {
-        let view = all_storages.custom_storage_or_insert(SparseSet::new)?;
+        let view = all_storages.component_storage_or_insert::<T>()?;
 
         let (sparse_set, borrow) = unsafe { ARef::destructure(view) };
 
@@ -247,7 +247,7 @@ impl<T: Component + Send + Sync> GetComponent for &'_ mut T {
         current: u32,
         entity: EntityId,
     ) -> Result<Self::Out<'a>, error::GetComponent> {
-        let view = all_storages.custom_storage_or_insert_mut(SparseSet::new)?;
+        let view = all_storages.component_storage_or_insert_mut::<T>()?;
 
         let (sparse_set, borrow) = unsafe { ARefMut::destructure(view) };
 
