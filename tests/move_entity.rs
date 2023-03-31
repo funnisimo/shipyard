@@ -7,7 +7,7 @@ struct U32(u32);
 impl Component for U32 {}
 
 #[test]
-fn move_world() {
+fn move_entity() {
     let mut world_a = World::default();
     let mut world_b = World::default();
 

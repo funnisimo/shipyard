@@ -16,7 +16,7 @@ use crate::entity_id::EntityId;
 use crate::get_component::GetComponent;
 use crate::iter_component::{IntoIterRef, IterComponent};
 use crate::memory_usage::AllStoragesMemoryUsage;
-use crate::move_world::Registry;
+use crate::move_entity::Registry;
 use crate::public_transport::RwLock;
 use crate::public_transport::ShipyardRwLock;
 use crate::reserve::BulkEntityIter;
